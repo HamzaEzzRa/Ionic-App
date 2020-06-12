@@ -1,0 +1,194 @@
+<!-- 
+  la partie header de la page contenant le boutton de retour vers la page d'accueil
+  un titre indiquant que c'est la page du profil et un autre boutton avec une icon
+  pour verouiller ou deverouiller la modification des données
+-->
+<ion-header>
+  <ion-toolbar>
+    <ion-title style="text-align: center;" [style.margin-left.%]="isFetching ? '0' : '22.25'">Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!isFetching" (click)="noEditing=!noEditing; selectedImage = null; imageData = null;">
+        <ion-icon name="create"></ion-icon>
+        <ion-label>Edit</ion-label>
+      </ion-button>
+    </ion-buttons>
+    <ion-progress-bar *ngIf="isFetching" color="light" type="indeterminate"></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+
+<!-- 
+  le contenu de la page qui contient l'identite, les coordonnées et la localisation
+  du docteur et coach 
+-->
+<ion-content *ngIf="!isFetching" center text-center class="profil">
+  
+  <!-- la premiere card contenant l'image du docteur ou coach et son nom et prenom -->
+
+  <ion-grid no-padding>
+
+    <ion-row>
+      <ion-col>
+        <ion-card class="cont ion-no-border">
+          <ion-card-content>
+            <img *ngIf="doctor_coach && noEditing" [src]="doctor_coach.imagePath ? doctor_coach.imagePath : 'assets/' + doctor_coach.sex + '.png'" style="width: 220px !important; height: 220px !important; object-fit: cover;">
+            <app-image-picker (imagePick)="onImagePicked($event)" *ngIf="!noEditing && !selectedImage"></app-image-picker>
+            <img *ngIf="!noEditing && imageData" [src]="imageData" style="width: 220px !important; height: 220px !important; object-fit: cover;">
+            <h1>{{doctor_coach.lastName + " " + doctor_coach.firstName}}</h1>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    
+    <ion-row>
+      <ion-col size="12" padding>
+
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)">
+          <ion-list margin-bottom>
+          
+            <!-- Identité -->
+            <ion-item-group>
+              <ion-item-divider class="labell">
+                <ion-label>General informations</ion-label>
+              </ion-item-divider>
+  
+              <!-- le nom du docteur ou coach avec le champ de saisie en cas de modification -->
+              <ion-item>
+                <ion-label color="dark" position="stacked">Last Name</ion-label>
+                <ion-input type="text" name="nom" #nom="ngModel" [readonly]="noEditing"
+                maxlength="20" pattern="[a-zA-Z\s]*[a-zA-Z]"
+                required [(ngModel)]="doctor_coach.lastName" 
+                placeholder="Enter your last name" >
+                </ion-input>
+                <label *ngIf="!nom.valid" style="color: red;">
+                  Your last name should contain only letters
+                </label>
+              </ion-item>
+            
+              <!-- le prenom du docteur ou coach avec le champ de saisie en cas de modification -->
+              <ion-item>
+                <ion-label color="dark" position="stacked">First Name</ion-label>
+                <ion-input 
+                  type="text" name="prenom" maxlength="20" [readonly]="noEditing"
+                  pattern="[a-zA-Z\s]*[a-zA-Z]" #prenom="ngModel"
+                  required [(ngModel)]="doctor_coach.firstName" 
+                  placeholder="Enter you first name" 
+                  >
+                </ion-input>
+                <label *ngIf="!prenom.valid" style="color: red;">
+                  Your first name should contain only letters
+                </label>
+              </ion-item>
+  
+              <!-- l'age du docteur ou coach calcule a partir de sa date de naissance -->
+              <ion-item>
+                <ion-label color="dark" position="stacked">Age</ion-label>
+                <ion-input 
+                [value]="age" [readonly]="noEditing"
+                type="text" 
+                placeholder="Enter your age" 
+                name="age" [disabled]="true"
+                readonly></ion-input>
+              </ion-item>
+  
+              <!-- la date de naissance du docteur ou coach avec le champ de saisie sous forme de picker en cas de modification -->
+              <ion-item>
+                <ion-label color="dark" position="stacked">Date of Birth</ion-label>
+                <ion-datetime [(ngModel)]="this.doctor_coach.birthday" name="date" [readonly]="noEditing" (ionChange)="setDateAndAge()" displayFormat="DD/MM/YYYY"  min="1920-01-01" [max]="currentDate"></ion-datetime>
+              </ion-item>
+  
+              <!-- la specialite du docteur ou coach avec une liste de specialite -->
+              <ion-item>
+                <ion-label color="dark" position="stacked">Speciality</ion-label>
+  
+                <!-- en cas du docteur on affiche la liste des specialites d'un docteur -->
+                <ion-select *ngIf="doctor_coach.role == 'doctor' ? true : false" 
+                 [(ngModel)]="doctor_coach.specialty" [disabled]="noEditing"
+                name="profession"
+                >
+
+                  <ion-select-option *ngFor="let doctorSpeciality of doctorSpecialities; index as doctorSpecialityIndex" [value]="doctorSpeciality">{{doctorSpeciality}}</ion-select-option>
+                  <ion-select-option value="Other">Other</ion-select-option>
+                </ion-select>
+  
+                <!-- en cas du coach on affiche la liste des specialites d'un coach -->
+                <ion-select *ngIf="doctor_coach.role == 'coach'?true:false" 
+                  [(ngModel)]="doctor_coach.specialty" [disabled]="noEditing"
+                name="profession"
+                (ionChange)="doctor_coach.specialty=coachSpecialities[doctor_coachSpecialityIndex]">
+                  <ion-select-option *ngFor="let coachSpeciality of coachSpecialities; index as coachSpecialityIndex" [value]="coachSpeciality">{{coachSpeciality}}</ion-select-option>
+                  <ion-select-option value="Other">Other</ion-select-option>
+                </ion-select>
+              
+              <!-- radio box pour le choix du sexe du docteur ou coach -->
+              </ion-item>
+
+              <ion-item>
+                <ion-label color="dark" position="stacked">Sex</ion-label>
+                <ion-select name="sexe"  [(ngModel)]="doctor_coach.sex" [disabled]="noEditing">
+                  <ion-select-option value="m">Male</ion-select-option>
+                  <ion-select-option value="f">Female</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-item-group>
+            
+            <br>
+            <!-- coordonnées et localisation -->
+            <ion-item-group>
+              <ion-item-divider class="labell">
+                <ion-label>Contact informations</ion-label>
+              </ion-item-divider>
+                        
+              <ion-item>
+                <ion-label color="dark" position="stacked">Email</ion-label>
+                <ion-input name="email" [(ngModel)]="email" type="email" [disabled]="true"
+                required email readonly placeholder="Ex.: joe@doe.com" ></ion-input>
+              </ion-item>
+                  
+              <ion-item>  
+                <ion-label color="dark" position="stacked">Phone Number</ion-label>
+                <ion-input name="telephone" [(ngModel)]="doctor_coach.phoneNumber" #telephone="ngModel"
+                type="text" required pattern="[0-9]{4,10}" [readonly]="noEditing"
+                placeholder="Ex.: 694865043"  
+                >
+                  {{countries[countryIndex] && countries[countryIndex].code }}&nbsp;</ion-input>
+                <label *ngIf="!telephone.valid" style="color: red;">
+                  Phone numbers should not exceed 10 digits.
+                </label>
+              </ion-item>
+  
+                <ion-item>  
+                  <ion-label color="dark" position="stacked">Country</ion-label>
+                  <ion-select [(ngModel)]="countryIndex" [disabled]="noEditing" (ionChange)="doctor_coach.country=countries[countryIndex].name;" name="country">
+                    <ion-select-option *ngFor="let country of countries; index as nCountry" [value]="nCountry">{{country.name}}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                
+                <ion-item>    
+                  <ion-label color="dark" position="stacked">Address</ion-label>
+                  <ion-input ngModel name="adresse"
+                  [(ngModel)]="doctor_coach.address" #adresse="ngModel"
+                  pattern="[a-zA-Z0-9\s,]*" [readonly]="noEditing"
+                  type="text" placeholder="Ex.: ..." 
+                   ></ion-input>
+                  <label *ngIf="!adresse.valid" style="color: red;">
+                    Address should start with a letter and it can't contain spacial characters. Only letters and spaces.
+                  </label>
+                </ion-item>
+
+                <ion-card style="top: 2vh">
+                  <ion-item lines="none">
+                    <ion-img role="button" (click)="onShowMap()" *ngIf="doctor_coach.staticMapImageUrl && noEditing" [src]="doctor_coach.staticMapImageUrl"></ion-img>
+                    <app-location-picker (locationPick)="onLocationPicked($event)" style="width: 100%" *ngIf="!noEditing"></app-location-picker>
+                  </ion-item>
+                </ion-card>
+              </ion-item-group>
+            </ion-list>
+            <br>
+            <ion-button type="submit" [disabled]="!f.valid || noEditing" size="large" expand="block" class="submit-button" no-margin>Save</ion-button>
+            <!-- <div [class]="hasLeftSegment ? 'HideAfterSegment' : ''" style="margin-top: 175px;"></div> -->
+        </form>
+              
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+</ion-content>

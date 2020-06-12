@@ -1,0 +1,21 @@
+ion-button {
+    position: relative;
+}
+
+ion-button.signout {
+    --background: #ff5c2a;
+    --color: rgb(236, 223, 223);
+    --border-radius: 10px;
+
+}
+
+ion-button.cancel {
+    --background: rgb(238, 229, 229);
+    --color: #5e4b46;
+    --border-radius: 10px;
+    
+}
+
+p {
+    text-align: center;
+}

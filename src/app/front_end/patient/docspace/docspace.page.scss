@@ -1,0 +1,31 @@
+ion-toolbar {
+    --background: #ff5c2a;
+    --color: #72605bee;
+    ion-label,ion-icon{
+        color: #72605bd5;
+    }
+}
+
+ion-segment-button {
+    --background: rgb(245, 231, 231);
+    --background-checked: linear-gradient(to left, rgba(243, 223, 223, 0.904), rgb(245, 226, 226))!important;
+    --color-checked: #ff5c2a !important;
+    --indicator-color: #ff5c2a !important;
+    --indicator-color-checked: #ff5c2a !important;
+}
+
+ion-fab-button.add {
+    --background: #ff5c2a;
+}
+
+ion-item {
+    ion-label {
+        font-size: 21px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        color: #965f42;
+    }
+}
+
+p.addbtn {
+    padding: 10px;
+}

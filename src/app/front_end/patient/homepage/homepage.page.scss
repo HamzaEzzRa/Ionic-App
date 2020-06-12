@@ -1,0 +1,45 @@
+ion-grid {
+    ion-row {
+        ion-col {
+            color: black;
+            border: 1px rgba(54, 162, 235, 0.5) ridge;
+            border-radius: 5px;
+            background-color:  white ;
+            text-align: center;
+            font-size: small;
+            img {
+                height: 40px;
+            }
+        }
+    }
+}
+
+ion-card {
+   ion-img {
+       height: 200px;
+   }
+}
+
+.not-working{
+    background-image: url("../../../../assets/state.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    cursor: not-allowed;
+    pointer-events: none;
+ 
+}
+
+.heartBeats{
+    background-image: url("../../../../assets/heartBeats.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 90%;
+}
+
+.steps{
+    background-image: url("../../../../assets/wm.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 90%;
+}
